@@ -1,7 +1,22 @@
-<html>
-  <header>
-  </header>
-  <body>
-    {{ bookings }}
-  </body>
-</html>
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="col-sm-6 col-sm-offset 3">
+<table>
+<tr>
+  <th>Booking</th>
+  <th>Contractor</th>
+  <th>Base Cost</th>
+</tr>
+
+{% for bid in bids %}
+<tr>
+  <td>{{ bid.booking }}</td>
+  <td>{{ bid.contractor }}</td>
+  <td>{{ bid.base_cost }}</td>
+</tr>
+{% endfor %}
+</table>
+
+</div>
+{% endblock %}

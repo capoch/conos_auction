@@ -1,9 +1,8 @@
-<html>
-  <header>
-  </header>
-  <body>
+{% extends 'base.html' %}
+<div class="col-sm-6 col-sm-offset 3">
+{% block content %}
     {{ transaction.amount }}
     {{ transaction.contractor }}
     {{ transaction.status }}
-  </body>
-</html>
+{% endblock %}
+</div>

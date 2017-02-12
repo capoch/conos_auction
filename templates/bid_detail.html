@@ -1,8 +1,8 @@
-<html>
-  <header>
-  </header>
-  <body>
-    {{ booking.name }}
-    {{ booking.phone_number }}
-  </body>
-</html>
+{% extends 'base.html' %}
+<div class="col-sm-6 col-sm-offset 3">
+{% block content %}
+    {{ bid.booking }}
+    {{ bid.contractor }}
+    {{ bid.base_cost }}
+{% endblock %}
+</div>

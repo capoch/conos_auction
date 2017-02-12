@@ -1,7 +1,7 @@
 from django.conf.urls import url
 from django.contrib import admin
 
-from .views import (create_consumer, consumer_list, consumer_detail,
+from .views import (booking, create_consumer, consumer_list, consumer_detail,
 create_contractor, contractor_list, contractor_detail, create_transaction,
 transaction_list, transaction_detail, create_booking, booking_list,
 booking_detail, create_bid, bid_list, bid_detail)
@@ -22,4 +22,5 @@ urlpatterns = [
     url(r'^bid/create', create_bid, name="create-bid"),
     url(r'^bid/$', bid_list, name="bid-list"),
     url(r'^bid/(?P<id>[\w+])', bid_detail, name="bid-detail"),
+    url(r'^test', booking, name="test"),
 ]

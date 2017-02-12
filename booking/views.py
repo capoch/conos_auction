@@ -1,12 +1,63 @@
 from django.contrib import messages
 from django.http import Http404, HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.utils import timezone
+import datetime
 
 from .forms import (BidForm, BookingForm, ConsumerForm, ContractorForm,
 TransactionForm)
-from .models import Bid, Booking, Consumer, Contractor, Transaction
+from .managers import BookingManager
+from .models import Agent, Bid, Booking, Category, Consumer, Contractor, Suburb, Transaction
 
 # Create your views here.
+def booking(request):
+    booking = BookingManager()
+    agent=Agent.objects.get(user=request.user)
+    consumer=Consumer.objects.get(id='1')
+    category=Category.objects.get(id='1')
+    suburb=Suburb.objects.first()
+    # booking.create_booking(agent=agent, **{"consumer":consumer, "post_code":"800", "preferred_schedule":timezone.now,})
+    # booking.create_booking(agent=agent, address_1="aasdf", consumer=consumer,
+    # post_code=800, preferred_schedule=timezone.now, category=category,
+    # quoted_price=120.0, cost_adjustment=0.0, base_cost=120.0,
+    # priority_level=1, status='booking_status_active')
+    booking.create_booking(agent=agent, **{
+        "address_1": "aasdf",
+        "consumer": consumer,
+        "post_code": 800,
+        "preferred_schedule": datetime.datetime(2017, 2, 13, 6, 0),
+        "category": category,
+        "quoted_price": 120.0,
+        "cost_adjustment": 0.0,
+        "base_cost": 120.0,
+        "priority_level": 1,
+        "suburb": suburb,
+        "status": "booking_status_active",})
+    # form = BookingForm(request.POST or None, initial={"agent":request.user,"preferred_schedule":timezone.now()})
+    print("HEEELLLLLOOOOOOOOO")
+
+    # if form.is_valid():
+    #     fields = ['consumer','address_1','address_2','access_instructions',
+    #     'suburb','phone_number_2','post_code','preferred_schedule',
+    #     'category','subtypes', 'quoted_price','cost_adjustment','base_cost',
+    #     'priority_level','completed','status','comment_private',
+    #     'comment_public','link']
+    #     for key in key_list:
+    #         value = gettattr(form, key)
+    #         kwargs[key]= deal_with(value)
+    #     print(kwargs)
+    #     instance = booking.create_booking(agent=agent, **kwargs)
+    #     messages.success(request,"Successfully created")
+    #     return HttpResponseRedirect(instance.get_absolute_url())
+    # elif form.errors:
+    #     messages.error(request,"There was a problem, please try again")
+    # context = {
+    #     "form": form,
+    #     }
+    # return render(request,'booking_form.html', context)
+
+
+
 def create_bid(request):
     if not request.user.is_authenticated:
         raise Http404
@@ -38,15 +89,13 @@ def bid_list(request):
     return render(request,'bid_list.html', context)
 
 
-
-
-
 def create_booking(request):
     if not request.user.is_authenticated:
         raise Http404
-    form = BookingForm(request.POST or None)
+    form = BookingForm(request.POST or None, initial={"agent":request.user,"preferred_schedule":timezone.now()})
     if form.is_valid():
         instance = form.save(commit=False)
+        print(instance.preferred_schedule)
         instance.save()
         messages.success(request,"Successfully created")
         return HttpResponseRedirect(instance.get_absolute_url())
@@ -55,7 +104,7 @@ def create_booking(request):
     context = {
         "form": form,
         }
-    return render(request,'consumer_form.html', context)
+    return render(request,'booking_form.html', context)
 
 
 def booking_detail(request, id, *args, **kwargs):
@@ -128,6 +177,8 @@ def create_contractor(request):
 
 def contractor_detail(request, id, *args, **kwargs):
     contractor = Contractor.objects.get(id=id)
+    if not request.user.is_staff or not request.user==contractor.user:
+        raise Http404
     credits = contractor.credits
     context = {
         "contractor": contractor,

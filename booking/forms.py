@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import Consumer, Contractor, Transaction, Booking
+from .models import Bid, Booking, Consumer, Contractor, Transaction
 
 
 class BidForm(forms.ModelForm):
@@ -15,7 +15,6 @@ class BidForm(forms.ModelForm):
 
 
 class BookingForm(forms.ModelForm):
-    preferred_schedule = forms.DateTimeField(widget=forms.SplitDateTimeWidget)
 
     class Meta:
         model = Booking
