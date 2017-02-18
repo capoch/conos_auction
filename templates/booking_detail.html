@@ -2,7 +2,27 @@
 
 {% block content %}
 <div class="col-sm-6 col-sm-offset 3">
-    {{ booking.name }}
-    {{ booking.phone_number }}
+    {{ booking.consumer }}<br/>
+    {{ booking.address_1 }}<br/>
+    {{ booking.address_2 }}<br/>
+    {{ booking.access_instructions }}<br/>
+    {{ booking.suburb }}<br/>
+    {{ booking.phone_number_2 }}<br/>
+    {{ booking.agent }}<br/>
+    {{ booking.post_code }}<br/>
+    {{ booking.preferred_schedule }}<br/>
+    {{ booking.category }}<br/>
+    {% for subtype in booking.subtypes.all %}
+    {{ subtype }}<br/>
+    {% endfor %}
+    {{ booking.quoted_price }}<br/>
+    {{ booking.cost_adjustment }}<br/>
+    {{ booking.base_cost }}<br/>
+    {{ booking.priority_level }}<br/>
+    {{ booking.completed }}<br/>
+    {{ booking.status }}<br/>
+    {{ booking.comment_private }}<br/>
+    {{ booking.comment_public }}<br/>
+    {{ booking.link }}
 </div>
 {% endblock %}

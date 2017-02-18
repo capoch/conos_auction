@@ -24,7 +24,6 @@ class BookingManager(object):
             _subtypes = kwargs.get('subtypes', [])
             del kwargs['subtypes']
         _booking = Booking(agent=agent, *args, **kwargs)
-        print(_booking)
         _booking.save()
         if len(_subtypes) > 0:
             for _subtype in _subtypes:

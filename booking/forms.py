@@ -1,4 +1,5 @@
 from django import forms
+import floppyforms.__future__ as forms
 
 from .models import Bid, Booking, Consumer, Contractor, Transaction
 
@@ -19,7 +20,7 @@ class BookingForm(forms.ModelForm):
     class Meta:
         model = Booking
         fields = ['consumer','address_1','address_2','access_instructions',
-        'suburb','phone_number_2','agent','post_code','preferred_schedule',
+        'suburb','phone_number_2','post_code','preferred_schedule',
         'category','subtypes', 'quoted_price','cost_adjustment','base_cost',
         'priority_level','completed','status','comment_private',
         'comment_public','link']

@@ -266,7 +266,7 @@ class Booking(models.Model):
 
     #Added by Philipp
     def get_absolute_url(self):
-        return reverse('booking:booking-detail', kwargs = {"id": self.id})
+        return reverse('booking:booking-detail', kwargs = {"pk": self.pk})
 
 
 

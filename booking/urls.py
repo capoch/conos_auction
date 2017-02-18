@@ -18,9 +18,9 @@ urlpatterns = [
     url(r'^transaction/(?P<id>[\w+])', transaction_detail, name="transaction-detail"),
     url(r'^booking/create', create_booking, name="create-booking"),
     url(r'^booking/$', booking_list, name="booking-list"),
-    url(r'^booking/(?P<id>[\w+])', booking_detail, name="booking-detail"),
+    url(r'^booking/(?P<pk>\d+)', booking_detail, name="booking-detail"),
     url(r'^bid/create', create_bid, name="create-bid"),
     url(r'^bid/$', bid_list, name="bid-list"),
     url(r'^bid/(?P<id>[\w+])', bid_detail, name="bid-detail"),
-    url(r'^test', booking, name="test"),
+
 ]
