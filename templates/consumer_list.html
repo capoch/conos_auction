@@ -1,6 +1,8 @@
 {% extends 'base.html' %}
 <div class="col-sm-6 col-sm-offset 3">
 {% block content %}
-    {{ consumers }}
+{% for consumer in consumers %}
+    <a href="{% url 'booking:consumer-detail' id=consumer.id %}">{{ consumer.name }}</a><br/>
+{% endfor %}
 {% endblock %}
 </div>

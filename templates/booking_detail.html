@@ -1,28 +1,78 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="col-sm-6 col-sm-offset 3">
-    {{ booking.consumer }}<br/>
-    {{ booking.address_1 }}<br/>
-    {{ booking.address_2 }}<br/>
-    {{ booking.access_instructions }}<br/>
-    {{ booking.suburb }}<br/>
-    {{ booking.phone_number_2 }}<br/>
-    {{ booking.agent }}<br/>
-    {{ booking.post_code }}<br/>
-    {{ booking.preferred_schedule }}<br/>
-    {{ booking.category }}<br/>
-    {% for subtype in booking.subtypes.all %}
-    {{ subtype }}<br/>
-    {% endfor %}
-    {{ booking.quoted_price }}<br/>
-    {{ booking.cost_adjustment }}<br/>
-    {{ booking.base_cost }}<br/>
-    {{ booking.priority_level }}<br/>
-    {{ booking.completed }}<br/>
-    {{ booking.status }}<br/>
-    {{ booking.comment_private }}<br/>
-    {{ booking.comment_public }}<br/>
-    {{ booking.link }}
+<div class="col-sm-5 col-sm-offset 1">
+  <h3>Booking Data</h3><small>(<a href="{% url 'booking:edit-booking' pk=booking.pk %}">Edit</a>)</small><br/>
+
+  <table>
+    <tr>
+      <td>Consumer</td><td>{{ booking.consumer }}</td>
+    </tr>
+    <tr>
+      <td>Address</td><td>{{ booking.address_1 }}</td>
+    </tr>
+    <tr>
+      <td></td><td>{{ booking.address_2 }}</td>
+    </tr>
+    <tr>
+      <td>Access Instructions</td><td>{{ booking.access_instructions }}</td>
+    </tr>
+    <tr>
+      <td>Suburb</td><td>{{ booking.suburb }}</td>
+    </tr>
+    <tr>
+      <td>Phone 2</td><td>{{ booking.phone_number_2 }}</td>
+    </tr>
+    <tr>
+      <td>Agent</td><td>{{ booking.agent }}</td>
+    </tr>
+    <tr>
+      <td>Post Code</td><td>{{ booking.post_code }}</td>
+    </tr>
+    <tr>
+      <td>Preferred Schedule</td><td>{{ booking.preferred_schedule }}</td>
+    </tr>
+    <tr>
+      <td>Category</td><td>{{ booking.category }}</td>
+    </tr>
+      {% for subtype in booking.subtypes.all %}
+    <tr>
+      <td>Category</td><td>{{ subtype }}</td>
+    </tr>
+      {% endfor %}
+    <tr>
+      <td>Quoted Price</td><td>{{ booking.quoted_price }}</td>
+    </tr>
+    <tr>
+      <td>Price Adjustment</td><td>{{ booking.cost_adjustment }}</td>
+    </tr>
+    <tr>
+      <td>Base Cost</td><td>{{ booking.base_cost }}</td>
+    </tr>
+    <tr>
+      <td>Priority</td><td>{{ booking.priority_level }}</td>
+    </tr>
+    <tr>
+      <td>Completed</td><td>{{ booking.completed }}</td>
+    </tr>
+    <tr>
+      <td>Status</td><td>{{ booking.status }}</td>
+    </tr>
+    <tr>
+      <td>Private Comments</td><td>{{ booking.comment_private }}</td>
+    </tr>
+    <tr>
+      <td>Public Comments</td><td>{{ booking.comment_public }}</td>
+    </tr>
+    <tr>
+      <td>Link</td><td>{{ booking.link }}</td>
+    </tr>
+    </table>
+</div>
+<div class="col-sm-5">
+  <h3>Placed Bids:</h3><small>(<a href="{% url 'booking:booking-auction' pk=booking.pk %}">Auction!</a>)</small><br/>
+  {% for bid in bids %}
+  <p>{{ bid.contractor.name }} {{ bid.base_cost }}</p>
+  {% endfor %}
 </div>
 {% endblock %}

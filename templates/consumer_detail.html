@@ -1,9 +1,11 @@
 {% extends 'base.html' %}
 <div class="col-sm-6 col-sm-offset 3">
 {% block content %}
-
-    {{ consumer.name }}
-    {{ consumer.phone_number }}
-
+<h3>Contractor: {{ consumer.name }}</h3>
+<small>{{ consumer.phone_number }}</small>
+<h3>My Bookings</h3>
+  {% for booking in bookings %}
+  <a href="{% url 'booking:booking-detail' pk=booking.pk %}">{{ booking.category }}  {{ booking.preferred_schedule }}  {{ booking.status }}</a><br/>
+  {% endfor %}
 {% endblock %}
 </div>

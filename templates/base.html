@@ -40,6 +40,14 @@
             <li><a href="{% url 'booking:contractor-list' %}">Contractors</a></li>
             <li><a href="{% url 'booking:transaction-list' %}">Transactions</a></li>
           </ul>
+          <ul class="nav navbar-nav navbar-right">
+            {% if request.user.is_authenticated %}
+            <li><a href="#">Welcome {{ request.user }}</a></li>
+            <li><a href="{% url 'logout' %}">Logout</a></li>
+            {% else %}
+            <li><a href="{% url 'login' %}">Login</a></li>
+            {% endif %}
+          </ul>
         </div><!--/.nav-collapse -->
       </div>
     </nav>

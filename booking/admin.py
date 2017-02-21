@@ -82,3 +82,4 @@ admin.site.register(Transaction)
 admin.site.register(Preferred)
 ## added by Philipp
 admin.site.register(Suburb)
+admin.site.register(Alert)

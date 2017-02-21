@@ -18,10 +18,14 @@ from django.contrib import admin
 from django.conf import settings
 
 from booking.views import create_consumer
+from accounts.views import login_view, register_view, logout_view
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^create/', create_consumer, name="create_consumer"),
+    url(r'^login/', login_view, name="login"),
+    url(r'^logout/', logout_view, name="logout"),
+    url(r'^register/', register_view, name="register"),
     url(r'^', include("booking.urls", namespace="booking")),
 
 ]

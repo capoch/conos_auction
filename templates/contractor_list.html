@@ -1,6 +1,9 @@
 {% extends 'base.html' %}
 <div class="col-sm-6 col-sm-offset 3">
 {% block content %}
-    {{ contractors }}
+{% for contractor in contractors %}
+    <a href="{% url 'booking:contractor-detail' id=contractor.id %}">{{ contractor.name }}</a>
+    {{ contractor.categories.all }}<br/>
+{% endfor %}
 {% endblock %}
 </div>

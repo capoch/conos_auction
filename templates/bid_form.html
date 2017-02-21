@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 <div class="col-sm-6 col-sm-offset 3">
 {% block content %}
+    <h3>Place bid for {{ booking }}</h3>
     <form method="POST" action=".">{% csrf_token %}
       {{ form.as_p }}
       <input type="submit" value="Save"/>

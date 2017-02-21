@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     #own
     'booking',
+    'accounts',
     #3rd party (philipp)
     'floppyforms',
     'debug_toolbar',

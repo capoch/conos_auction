@@ -11,7 +11,7 @@
 
 {% for bid in bids %}
 <tr>
-  <td>{{ bid.booking }}</td>
+  <td><a href="{% url 'booking:booking-detail' pk=bid.booking.id %}">{{ bid.booking }}</a></td>
   <td>{{ bid.contractor }}</td>
   <td>{{ bid.base_cost }}</td>
 </tr>

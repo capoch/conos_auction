@@ -1,19 +1,19 @@
 from django.contrib import messages
 from django.http import Http404, HttpResponseRedirect
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404, render, redirect
 from django.utils import timezone
 import datetime
 
 from .forms import (BidForm, BookingForm, ConsumerForm, ContractorForm,
 TransactionForm)
-from .managers import BookingManager
+from .managers import BiddingManager, BookingManager
 from .models import Agent, Bid, Booking, Category, Consumer, Contractor, Suburb, Transaction
 
 # Create your views here.
 def create_bid(request):
     if not request.user.is_authenticated:
         raise Http404
-    form = BidForm(request.POST or None)
+    form = BidForm_Agent(request.POST or None)
     if form.is_valid():
         instance = form.save(commit=False)
         instance.save()
@@ -25,6 +25,34 @@ def create_bid(request):
         "form": form,
         }
     return render(request,'bid_form.html', context)
+
+def place_bid(request, pk, id, *args, **kwargs):
+    if not request.user.is_authenticated:
+        raise Http404
+    contractor=Contractor.objects.get(pk=pk)
+    booking=Booking.objects.get(id=id)
+    form = BidForm(request.POST or None, initial={booking:booking})
+    if form.is_valid():
+        kwargs = form.cleaned_data
+        instance = BiddingManager.place_bid(contractor=contractor, booking=booking, **kwargs)
+        messages.success(request,"Successfully created")
+        return HttpResponseRedirect(contractor.get_absolute_url())
+    elif form.errors:
+        messages.error(request,"There was a problem, please try again")
+    context = {
+        "form": form,
+        "booking": booking,
+        }
+    return render(request,'bid_form.html', context)
+
+def bid_auction(request, pk):
+    booking = Booking.objects.get(pk=pk)
+    bid_list = ()
+    bid_list = BiddingManager.exec_auction(booking=booking)
+    context = {
+        "bid_list":bid_list,
+    }
+    return render(request, 'booking_auction.html', context)
 
 def bid_detail(request, id, *args, **kwargs):
     bid = Bid.objects.get(id=id)
@@ -45,11 +73,10 @@ def create_booking(request):
     if not request.user.is_authenticated:
         raise Http404
     agent = Agent.objects.get(user=request.user)
-    booking = BookingManager()
-    form = BookingForm(request.POST or None, initial={"agent":request.user,"preferred_schedule":timezone.now()})
+    form = BookingForm(request.POST or None, initial={"preferred_schedule":timezone.now()})
     if form.is_valid():
         kwargs = form.cleaned_data
-        instance = booking.create_booking(agent=agent, **kwargs)
+        instance = BookingManager.create_booking(agent=agent, **kwargs)
         messages.success(request,"Successfully created")
         return HttpResponseRedirect(instance.get_absolute_url())
     elif form.errors:
@@ -59,11 +86,30 @@ def create_booking(request):
         }
     return render(request,'booking_form.html', context)
 
+def edit_booking(request, pk=None):
+    if not request.user.is_authenticated:
+        raise Http404
+    agent = Agent.objects.get(user=request.user)
+    booking = get_object_or_404(Booking,pk=pk)
+    form = BookingForm(request.POST or None, instance=booking)
+    if form.is_valid():
+        kwargs = form.cleaned_data
+        instance = BookingManager.update_booking(agent=agent, booking=booking, **kwargs)
+        messages.success(request,"Successfully created")
+        # return HttpResponseRedirect(instance.get_absolute_url())
+    elif form.errors:
+        messages.error(request,"There was a problem, please try again")
+    context = {
+        "form": form,
+        }
+    return render(request,'booking_form.html', context)
 
 def booking_detail(request, pk, *args, **kwargs):
     booking = Booking.objects.get(pk=pk)
+    bids = Bid.objects.filter(booking_id=pk)
     context = {
         "booking": booking,
+        "bids": bids,
     }
     print(context)
     return render(request,'booking_detail.html', context)
@@ -97,8 +143,10 @@ def create_consumer(request):
 
 def consumer_detail(request, id, *args, **kwargs):
     consumer = Consumer.objects.get(id=id)
+    bookings = Booking.objects.filter(consumer=consumer)
     context = {
         "consumer": consumer,
+        "bookings": bookings,
     }
     return render(request,'consumer_detail.html', context)
 
@@ -131,12 +179,20 @@ def create_contractor(request):
 
 def contractor_detail(request, id, *args, **kwargs):
     contractor = Contractor.objects.get(id=id)
-    if not request.user.is_staff or not request.user==contractor.user:
+    if not request.user.is_staff and not request.user==contractor.user:
         raise Http404
     credits = contractor.credits
+    active_bids = Bid.objects.filter(contractor=contractor, status='bid_status_active')
+    winning_bids = Bid.objects.filter(contractor=contractor, status='bid_status_accepted')
+    losing_bids = Bid.objects.filter(contractor=contractor, status='bid_status_expired')
+    bookings = Booking.objects.filter(category_id__in=contractor.categories.values_list('id')).filter(completed=False).filter(status="booking_status_active")
     context = {
         "contractor": contractor,
         "credits": credits,
+        "active_bids": active_bids,
+        "winning_bids": winning_bids,
+        "losing_bids": losing_bids,
+        "bookings": bookings,
     }
     return render(request,'contractor_detail.html', context)
 

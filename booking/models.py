@@ -215,7 +215,8 @@ class Contractor(models.Model):
         '''Returns a Boolean value if post_code is within post_ranges.'''
         post_ranges = self.post_ranges
         for _pr in post_ranges:
-            if post_code in range(_pr[0], _pr[1]):
+            #Philipp: _pr[1]->_pr[1]+1, otherwise unintuitive
+            if post_code in range(_pr[0], _pr[1]+1):
                 return True
         return False
 
@@ -243,7 +244,7 @@ class Booking(models.Model):
     post_code = models.IntegerField()
     preferred_schedule = models.DateTimeField()
     category = models.ForeignKey(Category)
-    subtypes = models.ManyToManyField(SubType, blank=True)
+    subtypes = models.ManyToManyField(SubType, blank=True) #null added by Philipp (otherwise remove from queryset not possible)
     created_on = models.DateTimeField(auto_now_add=True)
     quoted_price = models.DecimalField(decimal_places=2, max_digits=6)
     cost_adjustment = models.DecimalField(default=0.00, decimal_places=2,
@@ -355,7 +356,8 @@ class Preferred(models.Model):
         '''Returns a Boolean value if post_code is within post_ranges.'''
         post_ranges = self.post_ranges
         for _pr in post_ranges:
-            if post_code in range(_pr[0], _pr[1]):
+            #Philipp: _pr[1]->_pr[1]+1, otherwise unintuitive
+            if post_code in range(_pr[0], _pr[1]+1):
                 return True
         return False
 

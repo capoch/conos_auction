@@ -4,11 +4,22 @@ import floppyforms.__future__ as forms
 from .models import Bid, Booking, Consumer, Contractor, Transaction
 
 
-class BidForm(forms.ModelForm):
+class BidForm_Agent(forms.ModelForm):
 
     class Meta:
         model = Bid
         fields = ['booking','contractor','base_cost','premium_adjustment',
+        'status']
+
+    def clean(self):
+        booking = self.cleaned_data.get('booking')
+
+
+class BidForm(forms.ModelForm):
+
+    class Meta:
+        model = Bid
+        fields = ['base_cost','premium_adjustment',
         'status']
 
     def clean(self):

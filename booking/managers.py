@@ -35,17 +35,21 @@ class BookingManager(object):
     def update_booking(cls, agent=None, booking=None, *args, **kwargs):
         '''Updates a booking's details. Returns the result of
            QuerySet.update().'''
+
         if not agent:
             raise Exception('First parameter agent is required.')
         if not booking:
             raise Exception('Second parameter booking is required.')
-        if not agent.has_perms(PERM_ACTION_UPDATE, PERM_LOCATION_BOOKINGS):
-            raise AgentNotAuthorized('UPDATE', 'BOOKINGS')
+        # creates __init__() error -> Check!
+        # if not agent.has_perms(PERM_ACTION_UPDATE, PERM_LOCATION_BOOKINGS):
+        #     print("Here we go")
+        #     raise AgentNotAuthorized('UPDATE', 'BOOKINGS')
         _subtypes = []
         if 'subtypes' in kwargs:
             _subtypes = kwargs.get('subtypes', [])
             del kwargs['subtypes']
-        if len(_subtypes) > 0:
+        if len(_subtypes) >= 0:
+                #changed from >0 to >=0, otherwise changing to "no subtype" skipped
             _booking = Booking.objects.get(pk=booking.pk)
             for _subtype in _booking.subtypes.all():
                 if _subtype not in _subtypes:
@@ -95,8 +99,8 @@ class BiddingManager(object):
     '''Manages CRUD operations for biddings, done by contractors.
        Checks for available balance and so on.'''
 
-    @classmethod
-    def place_bid(cls, contractor=None, *args, **kwargs):
+    @classmethod #Philipp: Added booking
+    def place_bid(cls, contractor=None, booking=None, *args, **kwargs):
         '''Places a bid with a contractor, checking credits and account
            permissions. Returns a tuple (Bid, Transaction).'''
         if not contractor:
@@ -105,16 +109,19 @@ class BiddingManager(object):
         if not contractor.active:
             raise ContractorNotEligible()
 
-        try:
-            booking = kwargs['booking']
-            if booking.total_cost > contractor.credits:
-                raise ContractorNotEligible('Insufficient credits.')
-            if booking.category not in contractor.categories.all():
-                raise ContractorNotEligible('Category mismatched.')
-        except KeyError:
-                raise Exception('Required parameter booking not found.')
+        if not booking:
+            raise Exception('Second parameter booking is required.')
 
-        _bid = Bid(contractor=contractor, *args, **kwargs)
+        # try:
+        #     booking = kwargs['booking']
+        if booking.total_cost > contractor.credits:
+            raise ContractorNotEligible('Insufficient credits.')
+        if booking.category not in contractor.categories.all():
+            raise ContractorNotEligible('Category mismatched.')
+        # except KeyError:
+        #         raise Exception('Required parameter booking not found.')
+
+        _bid = Bid(contractor=contractor, booking=booking, *args, **kwargs)
         _bid.save()
 
         _transaction = Transaction(
@@ -189,7 +196,12 @@ class BiddingManager(object):
 
         _bids = [BidSummary(booking, _bid) for _bid in booking.bids.all()]
         _winning_bid = cls.get_winning_bid(_bids)
+        #Philipp: close winning-bid, Alerts?:
+        cls.close_bid(bid=_winning_bid.bid, status=BID_STATUS_ACCEPTED)
         _bids.remove(_winning_bid)
+        #Philipp: close non-winning-bids, Alerts?:
+        for _bid in _bids:
+            cls.close_bid(bid=_bid.bid, status=BID_STATUS_EXPIRED)
         _second_bid = cls.get_winning_bid(_bids)
         _bids.remove(_second_bid)
         print "Winner: %s" % (_winning_bid.__unicode__())
