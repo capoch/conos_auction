@@ -40,10 +40,8 @@ class BookingManager(object):
             raise Exception('First parameter agent is required.')
         if not booking:
             raise Exception('Second parameter booking is required.')
-        # creates __init__() error -> Check!
-        # if not agent.has_perms(PERM_ACTION_UPDATE, PERM_LOCATION_BOOKINGS):
-        #     print("Here we go")
-        #     raise AgentNotAuthorized('UPDATE', 'BOOKINGS')
+        if not agent.has_perms(PERM_ACTION_UPDATE, PERM_LOCATION_BOOKINGS):
+            raise AgentNotAuthorized('UPDATE', 'BOOKINGS')
         _subtypes = []
         if 'subtypes' in kwargs:
             _subtypes = kwargs.get('subtypes', [])
@@ -241,3 +239,26 @@ class AlertsManager(object):
         res = r.json()
         if not res["success"]:
             raise Exception("Failed: %s" % (res["msg"]))
+
+#Philipp:
+class TransactionManager(object):
+    ''' Buys and reedems credits for contractors.'''
+
+    @classmethod
+    def buy_credits(cls, source_agent=None, contractor=None, *args, **kwargs):
+        if not source_agent:
+            raise Exception('First parameter agent is required.')
+        if not source_agent.has_perms(PERM_ACTION_CREATE, PERM_LOCATION_TOPUPS):
+            raise AgentNotAuthorized('CREATE', 'TOPUPS')
+
+
+        _transaction = Transaction(
+            transaction_type=TRANS_TYPE_BUY,
+            source_agent=source_agent,
+            contractor=contractor,
+            source_type=TRANS_SOURCE_AGENT,
+            *args,
+            **kwargs
+        )
+        _transaction.save()
+        return (_transaction)

@@ -1,5 +1,6 @@
 class AgentNotAuthorized(Exception):
-    def __init__(self, action):
+    #Philipp: Added location to __init__
+    def __init__(self, action, location):
         Exception.__init__(
             self,
             "Agent not authorized to perform action %s on %s." %

@@ -69,8 +69,7 @@ class TransactionForm(forms.ModelForm):
 
     class Meta:
         model = Transaction
-        fields = ['transaction_type','amount','source_agent','contractor',
-        'source_type','target_bid','status','comment']
+        fields = ['amount','status','comment']
 
     def clean(self):
         amount = self.cleaned_data.get('amount')

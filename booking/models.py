@@ -157,8 +157,7 @@ class SubType(models.Model):
     def __unicode__(self):
         return self.name
 
-
-class Contractor(models.Model):
+class Contractor(models.Model):        
     '''Contractors. Authenticates via built-in Django
        user class. Uses a Json-serialized list to store post_ranges.'''
     name = models.CharField(max_length=128, unique=True)

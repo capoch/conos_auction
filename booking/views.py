@@ -6,8 +6,9 @@ import datetime
 
 from .forms import (BidForm, BookingForm, ConsumerForm, ContractorForm,
 TransactionForm)
-from .managers import BiddingManager, BookingManager
-from .models import Agent, Bid, Booking, Category, Consumer, Contractor, Suburb, Transaction
+from .managers import BiddingManager, BookingManager, TransactionManager
+from .models import (Agent, Bid, Booking, Category, Consumer, Contractor,
+Preferred, Suburb, Transaction)
 
 # Create your views here.
 def create_bid(request):
@@ -30,6 +31,8 @@ def place_bid(request, pk, id, *args, **kwargs):
     if not request.user.is_authenticated:
         raise Http404
     contractor=Contractor.objects.get(pk=pk)
+    if not request.user.is_staff and not request.user==contractor.user:
+        raise Http404
     booking=Booking.objects.get(id=id)
     form = BidForm(request.POST or None, initial={booking:booking})
     if form.is_valid():
@@ -186,6 +189,8 @@ def contractor_detail(request, id, *args, **kwargs):
     winning_bids = Bid.objects.filter(contractor=contractor, status='bid_status_accepted')
     losing_bids = Bid.objects.filter(contractor=contractor, status='bid_status_expired')
     bookings = Booking.objects.filter(category_id__in=contractor.categories.values_list('id')).filter(completed=False).filter(status="booking_status_active")
+    preferred = Preferred.objects.filter(category_id__in=contractor.categories.values_list('id'))
+    transactions = Transaction.objects.filter(contractor=contractor)
     context = {
         "contractor": contractor,
         "credits": credits,
@@ -193,6 +198,8 @@ def contractor_detail(request, id, *args, **kwargs):
         "winning_bids": winning_bids,
         "losing_bids": losing_bids,
         "bookings": bookings,
+        "preferred": preferred,
+        "transactions": transactions,
     }
     return render(request,'contractor_detail.html', context)
 
@@ -206,15 +213,17 @@ def contractor_list(request):
 
 
 
-def create_transaction(request, *args, **kwargs):
+def create_transaction(request, id=None, *args, **kwargs):
     if not request.user.is_authenticated:
         raise Http404
+    agent = Agent.objects.get(user=request.user)
+    contractor = Contractor.objects.get(id=id)
     form = TransactionForm(request.POST or None)
     if form.is_valid():
-        instance = form.save(commit=False)
-        instance.save()
+        kwargs = form.cleaned_data
+        instance = TransactionManager.buy_credits(source_agent=agent, contractor=contractor, **kwargs)
         messages.success(request,"Successfully created")
-        return HttpResponseRedirect(instance.get_absolute_url())
+        return HttpResponseRedirect(contractor.get_absolute_url())
     elif form.errors:
         messages.error(request,"There was a problem, please try again")
     context = {

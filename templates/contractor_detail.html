@@ -9,7 +9,7 @@
       {{ category }}
       {% endfor %}
     </small>
-    <h3> Credits: {{ credits }}</h3>
+    <h3> Credits: {{ credits }} (<a href="{% url 'booking:create-transaction' id=contractor.id %}">Buy</a>)</h3>
     <h3>Active Bids:</h3>
     {% for bid in active_bids %}
     {{ bid.id}}: {{ bid.booking.consumer.name }}: {{ bid.booking.preferred_schedule }}<br/>
@@ -20,14 +20,22 @@
     {% endfor %}
 </div>
 <div class="col-sm-6">
-<h3>Winning Bids:</h3>
-{% for bid in winning_bids %}
-{{ bid.id}}: {{ bid.booking.consumer.name }}: {{ bid.booking.preferred_schedule }}<br/>
-{% endfor %}
-<h3>Losing Bids:</h3>
-{% for bid in losing_bids %}
-{{ bid.id}}: {{ bid.booking.consumer.name }}: {{ bid.booking.preferred_schedule }}<br/>
-{% endfor %}
+  <h3>Preferred:</h3>
+  {% for pref in preferred %}
+  {{ pref.category}}: {{ pref.post_ranges_raw }}<br/>
+  {% endfor %}
+  <h3>Winning Bids:</h3>
+  {% for bid in winning_bids %}
+  {{ bid.id}}: {{ bid.booking.consumer.name }}: {{ bid.booking.preferred_schedule }}<br/>
+  {% endfor %}
+  <h3>Losing Bids:</h3>
+  {% for bid in losing_bids %}
+  {{ bid.id}}: {{ bid.booking.consumer.name }}: {{ bid.booking.preferred_schedule }}<br/>
+  {% endfor %}
+  <h3>Transactions:</h3>
+  {% for transaction in transactions %}
+  {{ transaction.transaction_type }}: {{ transaction.amount }} ({{ transaction.status }})<br/>
+  {% endfor %}
 </div>
 </row>
 {% endblock %}
